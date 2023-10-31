@@ -193,8 +193,8 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
       if (!found) {
         c.vulnerabilities.forEach((v) => {
           const ids = ([] as Array<string | undefined>)
-            .concat(v.identifiers!.CVE || [])
-            .concat([v.identifiers!.bug, v.identifiers!.issue])
+            .concat(v.identifiers?.CVE || [])
+            .concat([v.identifiers?.bug, v.identifiers?.issue])
             .filter((s) => s != undefined) as Array<string>;
           const id = ids[0] || "missing id";
           const otherRefs = ids
