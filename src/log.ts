@@ -300,7 +300,9 @@ export const consoleLogger: Logger = {
       logMsg(
         console.warn,
         "WRN",
-        `Libraries with known vulnerabilities found in ${url} loaded by ${initiator}:`
+        `Libraries with known vulnerabilities found in ${url} loaded by ${
+          initiator ?? "page"
+        }:`
       );
       vulnerableLibs.forEach((l) => {
         logMsg(console.warn, "WRN", ` * ${l.name}@${l.version}`);
@@ -311,7 +313,7 @@ export const consoleLogger: Logger = {
       logMsg(
         console.warn,
         "INF",
-        `Other libraries found in ${url} loaded by ${initiator}:`
+        `Other libraries found in ${url} loaded by ${initiator ?? "page"}:`
       );
       otherLibs.forEach((l) => {
         logMsg(console.warn, "INF", ` * ${l.name}@${l.version}`);

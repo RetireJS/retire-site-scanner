@@ -5,7 +5,7 @@ import getDomain from "./suffix-list";
 import URL from "node:url";
 
 export const UserAgent =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
 
 function isJavascriptContentType(contentType: string): boolean {
   if (contentType.includes("/javascript")) return true;
@@ -112,11 +112,11 @@ async function loadPage(
       })
     );
     await page.close();
+    log.info(`Page closed ` + promises.length);
     log.info("Javascripts found: " + javascripts.length);
     javascripts.forEach(([url, content, initiator]) => {
       promises.push(onJavaScript(url, content, initiator));
     });
-    log.info(`Page closed ` + promises.length);
     await Promise.all(promises);
     log.trace("Page promises resolved: " + promises.length);
   } catch (error) {
@@ -143,7 +143,7 @@ async function load(
 ) {
   log.info("Launching browser...");
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: "new",
     ignoreHTTPSErrors: true,
     args: [...defaultArgs, ...chromiumArgs],
   });

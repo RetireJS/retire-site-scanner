@@ -63,10 +63,15 @@ function _request(
       ...headers,
     },
   };
-
   return new Promise((resolve, reject) => {
     try {
-      if (url.startsWith("blob:")) return { statusCode: 404, content: "" };
+      if (url.startsWith("blob:")) {
+        return resolve({
+          statusCode: 404,
+          content: "",
+          contentType: undefined,
+        });
+      }
       log.trace("Requesting " + url + " ...");
       const req = (url.startsWith("http:") ? http : https)
         .request(url, defaultOptions, (res) => {
@@ -93,6 +98,7 @@ function _request(
           reject(err);
         });
       req.setTimeout(10000);
+      req.end();
     } catch (err) {
       log.trace("Failed to download " + url, err);
       reject(err);
@@ -113,12 +119,16 @@ function _http2Request(
 }> {
   return new Promise((resolve, reject) => {
     try {
+      if (url.startsWith("blob:")) {
+        resolve({ statusCode: 404, content: "", contentType: undefined });
+        return;
+      }
       const parsedURL = URL.parse(url);
       const origin = `${parsedURL.protocol}//${parsedURL.hostname}${
         parsedURL.port ? ":" + parsedURL.port : ""
       }`;
 
-      if (disableHttp2For.has(origin)) {
+      if (disableHttp2For.has(origin) || parsedURL.protocol != "https:") {
         return _request(url, headers).then(resolve).catch(reject);
       }
 
@@ -132,7 +142,6 @@ function _http2Request(
           ...headers,
         };
 
-        if (url.startsWith("blob:")) return { statusCode: 404, content: "" };
         log.trace("Requesting " + url + " ...");
         const req = session.request(defaultOptions);
         req.setTimeout(3000, () => {
@@ -171,6 +180,7 @@ function _http2Request(
               disableHttp2For.add(origin);
             }
             _request(url, headers).then(resolve).catch(reject);
+            session.close();
           } else {
             log.info("Error getting " + url, err);
             reject(err);
@@ -215,6 +225,14 @@ function _http2Request(
         });
         sessions[origin].on("timeout", () => {
           log.trace("HTTP2 session timed out " + origin);
+          delete sessions[origin];
+        });
+        sessions[origin].on("aborted", () => {
+          log.trace("HTTP2 session aborted " + origin);
+          delete sessions[origin];
+        });
+        sessions[origin].on("frameError", () => {
+          log.trace("HTTP2 session frameError " + origin);
           delete sessions[origin];
         });
       } else {
