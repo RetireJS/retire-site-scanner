@@ -9,7 +9,8 @@ jobs:
       push-image:
         runs-on: ubuntu-latest
         permissions:
-          issues: write
+          contents: read
+          packages: write
         steps:
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
