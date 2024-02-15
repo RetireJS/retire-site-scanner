@@ -1,9 +1,8 @@
 name: Deploy Images to GHCR
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
       push-image:
