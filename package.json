@@ -46,5 +46,8 @@
     "sbom-tool",
     "sbom-generator",
     "cli"
+  ],
+  "files": [
+    "dist/**/*"
   ]
 }
