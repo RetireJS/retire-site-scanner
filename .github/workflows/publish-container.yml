@@ -23,5 +23,5 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/retirejs/retire-scanner:latest
-              docker push ghcr.io/retirejs/retire-scanner:latest
+              docker build . --tag ghcr.io/retirejs/retire-site-scanner:latest
+              docker push ghcr.io/retirejs/retire-site-scanner:latest

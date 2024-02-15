@@ -1,10 +1,14 @@
 {
   "author": "Erlend Oftedal <erlend@oftedal.no>",
-  "name": "retire-scanner",
-  "version": "1.0.2",
+  "name": "retire-site-scanner",
+  "version": "1.0.3",
   "license": "Apache-2.0",
   "description": "A scanner for checking a web site using retire.js",
   "main": "dist/index.js",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/RetireJS/retire-scanner.git"
+	},
   "bin": {
     "retire-scanner": "dist/index.js"
   },
