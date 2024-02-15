@@ -38,7 +38,7 @@ export async function tryToGetSourceMap(
         new Set(Array.from(m).map((x) => p + "/" + x[1]))
       );
     }
-    const sources = [];
+    const sources: string[] = [];
     for (const u of sourceMapUrls) {
       log.trace(`Trying source map URL: ${u}`);
       requests[u] = true;
