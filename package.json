@@ -9,7 +9,7 @@
     "retire-scanner": "dist/index.js"
   },
   "scripts": {
-    "start": "NODE_NO_WARNINGS=1 NODE_TLS_REJECT_UNAUTHORIZED=0 ts-node src/index",
+    "start": "ts-node src/index",
     "build": "tsc --build",
     "watch": "tsc --watch",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",

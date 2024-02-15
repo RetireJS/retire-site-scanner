@@ -1,11 +1,11 @@
-import https from "https";
+import https, { RequestOptions as HttpsRequestOptions } from "https";
 import http2, {
   ClientHttp2Session,
   IncomingHttpHeaders,
   IncomingHttpStatusHeader,
 } from "http2";
 import URL from "url";
-import http, { RequestOptions } from "http";
+import http from "http";
 import log from "./log";
 import { UserAgent } from "./browser";
 
@@ -53,7 +53,7 @@ function _request(
   content: string;
   contentType: string | undefined;
 }> {
-  const defaultOptions: RequestOptions = {
+  const defaultOptions: HttpsRequestOptions = {
     method: "GET",
     headers: {
       "user-agent": UserAgent,
@@ -62,6 +62,7 @@ function _request(
       accept: "*/*",
       ...headers,
     },
+    rejectUnauthorized: false,
   };
   return new Promise((resolve, reject) => {
     try {
@@ -189,7 +190,9 @@ function _http2Request(
       };
 
       if (!sessions[origin]) {
-        sessions[origin] = http2.connect(origin);
+        sessions[origin] = http2.connect(origin, {
+          rejectUnauthorized: false,
+        });
         sessions[origin].on("error", (err) => {
           delete sessions[origin];
           if (
