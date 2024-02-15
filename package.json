@@ -1,7 +1,7 @@
 {
   "author": "Erlend Oftedal <erlend@oftedal.no>",
   "name": "retire-scanner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "Apache-2.0",
   "description": "A scanner for checking a web site using retire.js",
   "main": "dist/index.js",
@@ -12,6 +12,7 @@
     "start": "ts-node src/index",
     "build": "tsc --build",
     "watch": "tsc --watch",
+    "check": "npm run lint && npm run typecheck",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
   },
