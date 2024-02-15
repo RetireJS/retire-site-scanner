@@ -1,0 +1,27 @@
+name: Deploy Images to GHCR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+      push-image:
+        runs-on: ubuntu-latest
+        permissions:
+          issues: write
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+
+          - name: 'Build Inventory Image'
+            run: |
+              docker build . --tag ghcr.io/RetireJS/retire-scanner:latest
+              docker push ghcr.io/RetireJS/retire-scanner:latest
