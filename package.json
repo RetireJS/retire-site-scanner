@@ -12,6 +12,7 @@
     "start": "ts-node src/index",
     "build": "tsc --build",
     "watch": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
     "lint": "eslint . --ext .js,.ts --fix --ignore-path .gitignore"
