@@ -3,25 +3,42 @@
 Scans a URL and looks for JavaScript libraries with known vulnerabilities using retire.js. Can also produce a partial SBOM for the site.
 
 
-### Install
+## Install with npm
 
 ```
-git clone git@github.com:RetireJS/retire-scanner.git
-cd retire-scanner
+npm install -g retire-site-scanner
+```
+Run:
+```
+retire-site-scanner [-v] [--sbom] <url> 
+```
+
+## Run using docker
+
+```
+docker run --rm  ghcr.io/retirejs/retire-site-scanner:latest [-v] [--sbom] <url>
+```
+
+
+## Install from source
+
+```
+git clone git@github.com:RetireJS/retire-site-scanner.git
+cd retire-site-scanner
 npm install
 ```
 
-### Direct
+### Run directly from source
 ```
 npm run start -- <url> [-v] [--sbom]
 ```
-### Docker
+### Run using Docker
 
 **Build container**
 
 ```
-git clone git@github.com:RetireJS/retire-scanner.git
-cd retire-scanner
+git clone git@github.com:RetireJS/retire-site-scanner.git
+cd retire-site-scanner
 docker build -t retire-site-scanner .
 ```
 **Scanning**

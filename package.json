@@ -7,10 +7,10 @@
   "main": "dist/index.js",
   "repository": {
 		"type": "git",
-		"url": "https://github.com/RetireJS/retire-scanner.git"
+		"url": "https://github.com/RetireJS/retire-site-scanner.git"
 	},
   "bin": {
-    "retire-scanner": "dist/index.js"
+    "retire-site-scanner": "dist/index.js"
   },
   "scripts": {
     "start": "ts-node src/index",
