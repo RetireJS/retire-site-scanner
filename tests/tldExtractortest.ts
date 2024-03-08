@@ -3,7 +3,7 @@ import getDomain from "../src/suffix-list";
 
 async function expectDomain(
   target: string,
-  expectedDomain: string
+  expectedDomain: string,
 ): Promise<void> {
   const d = await getDomain("https://" + target, "https://www.banana.com");
   expect(d).to.equal(expectedDomain);

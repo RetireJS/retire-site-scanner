@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+Add support for .js.LICENSE.txt 
+
 ## 1.0.4
 
 Renaming repository from retire-scanner to retire-site-scanner as name was taken

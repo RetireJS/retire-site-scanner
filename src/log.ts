@@ -29,7 +29,7 @@ type Logger = {
   logResults: (
     url: string,
     initiator: string | undefined,
-    results: Array<Component>
+    results: Array<Component>,
   ) => void;
   logServices: (services: Services) => void;
   setLevel: (l: LogLevel) => void;
@@ -103,7 +103,7 @@ export function simplifyServiceEndpoint(url: string): string {
     .replace(/(v[0-9]+(\.[0-9]+)?\/).*/, "$1") // Stop at version like /v1/ or /v3.2/
     .replace(
       /\/[^/]*[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}[^/]*\/.*/, //Stop at UUID paths
-      "/"
+      "/",
     );
   return u.slice(0, 3).join("/") + "/" + a;
 }
@@ -134,19 +134,19 @@ function convertContentType(contentType: string): string {
 }
 
 function formatContentTypes(
-  data: { inboundContentType: string; outboundContentType?: string }[]
+  data: { inboundContentType: string; outboundContentType?: string }[],
 ): string {
   const inbound = unique(
     data
       .map((x) => x.inboundContentType)
       .map((x) => convertContentType(x.split(";")[0]))
-      .filter((x) => x != "")
+      .filter((x) => x != ""),
   );
   const outbound = unique(
     data
       .map((x) => x.outboundContentType)
       .filter((x): x is string => x != undefined && x != "")
-      .map((x) => convertContentType(x.split(";")[0]))
+      .map((x) => convertContentType(x.split(";")[0])),
   );
   return [
     inbound.length > 0 ? "Inbound: " + inbound.join(", ") + "." : "",
@@ -161,12 +161,12 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
   const vulnerabilities: Array<CycloneDXVulnerability> = [];
   const bomRef = randomUUID();
   const services: Array<CycloneDXService> = Object.entries(
-    resultToConvert.services
+    resultToConvert.services,
   ).map(([k, s]) => {
     return {
       name: k,
       endpoints: filterDuplicates(
-        s.map((u) => simplifyServiceEndpoint(u.url))
+        s.map((u) => simplifyServiceEndpoint(u.url)),
       ).sort(),
       description: formatContentTypes(s),
     };
@@ -256,13 +256,13 @@ export const jsonLogger: Logger = {
   traceEnabled,
   close: () => {
     console.log(
-      JSON.stringify(convertToCycloneDX(collectedResults), undefined, 2)
+      JSON.stringify(convertToCycloneDX(collectedResults), undefined, 2),
     );
   },
   logResults: (
     url: string,
     initiator: string | undefined,
-    results: Array<Component>
+    results: Array<Component>,
   ) => {
     collectedResults.components.push({ url, initiator, results });
   },
@@ -291,10 +291,10 @@ export const consoleLogger: Logger = {
   logResults: (
     url: string,
     initiator: string | undefined,
-    results: Array<Component>
+    results: Array<Component>,
   ) => {
     const vulnerableLibs = results.filter(
-      (lib) => lib.vulnerabilities.length > 0
+      (lib) => lib.vulnerabilities.length > 0,
     );
     if (vulnerableLibs.length > 0) {
       logMsg(
@@ -302,7 +302,7 @@ export const consoleLogger: Logger = {
         "WRN",
         `Libraries with known vulnerabilities found in ${url} loaded by ${
           initiator ?? "page"
-        }:`
+        }:`,
       );
       vulnerableLibs.forEach((l) => {
         logMsg(console.warn, "WRN", ` * ${l.name}@${l.version}`);
@@ -313,7 +313,7 @@ export const consoleLogger: Logger = {
       logMsg(
         console.warn,
         "INF",
-        `Other libraries found in ${url} loaded by ${initiator ?? "page"}:`
+        `Other libraries found in ${url} loaded by ${initiator ?? "page"}:`,
       );
       otherLibs.forEach((l) => {
         logMsg(console.warn, "INF", ` * ${l.name}@${l.version}`);
@@ -336,9 +336,9 @@ export const consoleLogger: Logger = {
                   " " +
                   n.inboundContentType +
                   " " +
-                  n.outboundContentType
+                  n.outboundContentType,
               )
-              .join(",\n")
+              .join(",\n"),
         );
       });
     }

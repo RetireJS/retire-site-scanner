@@ -5,7 +5,7 @@ import getDomain from "./suffix-list";
 import URL from "node:url";
 
 export const UserAgent =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
 function isJavascriptContentType(contentType: string): boolean {
   if (contentType.includes("/javascript")) return true;
@@ -16,14 +16,14 @@ function isJavascriptContentType(contentType: string): boolean {
 type JavaScriptCallback = (
   url: string,
   content: string,
-  initiator: string | undefined
+  initiator: string | undefined,
 ) => Promise<void>;
 
 type ServiceCallback = (
   domain: string,
   url: string,
   inboundContentType: string,
-  outboundContentType?: string
+  outboundContentType?: string,
 ) => Promise<void>;
 
 async function loadPage(
@@ -31,7 +31,7 @@ async function loadPage(
   url: string,
   onJavaScript: JavaScriptCallback,
   onPageLoaded: (page: Page) => Promise<void>,
-  onServiceInvoked: ServiceCallback
+  onServiceInvoked: ServiceCallback,
 ) {
   const page = await browser.newPage();
   try {
@@ -59,7 +59,7 @@ async function loadPage(
         } catch (err) {
           log.warn(
             "Will retry failed to load body for " + response.url(),
-            response.status()
+            response.status(),
           );
           let cookieHeader = {};
           try {
@@ -88,7 +88,7 @@ async function loadPage(
             domain,
             `${u.protocol}//${u.hostname}${u.pathname}`,
             contentType,
-            response.request().headers()["content-type"]
+            response.request().headers()["content-type"],
           );
         }
       }
@@ -109,7 +109,7 @@ async function loadPage(
         } catch (err) {
           log.warn("Failed to download body for: ", url);
         }
-      })
+      }),
     );
     await page.close();
     log.info(`Page closed ` + promises.length);
@@ -139,11 +139,11 @@ async function load(
   chromiumArgs: Array<string>,
   onJavaScript: JavaScriptCallback,
   onPageLoaded: (page: Page) => Promise<void>,
-  onServiceInvoked: ServiceCallback
+  onServiceInvoked: ServiceCallback,
 ) {
   log.info("Launching browser...");
   const browser = await puppeteer.launch({
-    headless: "new",
+    headless: "shell",
     ignoreHTTPSErrors: true,
     args: [...defaultArgs, ...chromiumArgs],
   });
@@ -156,7 +156,7 @@ async function load(
         url,
         onJavaScript,
         onPageLoaded,
-        onServiceInvoked
+        onServiceInvoked,
       );
       break;
     } catch (error) {

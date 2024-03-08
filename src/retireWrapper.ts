@@ -21,7 +21,7 @@ const hasher = {
 async function loadRetireJSRepo() {
   return await loadrepository(
     "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json",
-    retireOptions
+    retireOptions,
   );
 }
 
@@ -67,16 +67,19 @@ function getFuncs(repo: unknown): Record<string, string[]> {
       return [k, des.extractors.func];
     })
     .filter(([, funcs]) => funcs && funcs.length > 0)
-    .reduce((a, [k, funcs]) => {
-      a[k] = funcs;
-      return a;
-    }, {} as Record<string, string[]>);
+    .reduce(
+      (a, [k, funcs]) => {
+        a[k] = funcs;
+        return a;
+      },
+      {} as Record<string, string[]>,
+    );
 }
 
 function check(
   repo: unknown,
   version: string,
-  component: string
+  component: string,
 ): Array<Component> {
   const results = retire.check(component, version, repo);
   return convertResults(results, "querying the JavaScript on the page");
@@ -84,14 +87,14 @@ function check(
 
 async function runFuncs(
   repo: unknown,
-  evaluate: Evaluator
+  evaluate: Evaluator,
 ): Promise<Array<Component>> {
   const funcs = getFuncs(repo);
   const libs: [string, string][] = [];
   for (const [k, fs] of Object.entries(funcs)) {
     for (const f of fs) {
       const out = await evaluate(
-        `(function() { try{ return ${f} } catch(err) { return undefined } })()`
+        `(function() { try{ return ${f} } catch(err) { return undefined } })()`,
       );
       if (out) {
         libs.push([k, out]);
@@ -101,7 +104,7 @@ async function runFuncs(
   if (libs.length > 0) {
     log.debug(
       "JavaScript libraries detected on page: " +
-        unique(libs.map(([c, v]) => `${c}@${v}`)).join(", ")
+        unique(libs.map(([c, v]) => `${c}@${v}`)).join(", "),
     );
   }
   return libs
@@ -124,7 +127,7 @@ const scanner = () =>
         scanUri: (uri: string) => scanUri(repo, uri),
         scanContent: (contents: string) => scanContent(repo, contents),
         runFuncs: (evaluate: Evaluator) => runFuncs(repo, evaluate),
-      } as Scanner)
+      }) as Scanner,
   );
 
 export default scanner;

@@ -21,7 +21,7 @@ https.globalAgent.options.keepAlive = true;
 
 export default async function request(
   url: string,
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ): Promise<{
   statusCode: number;
   content: string;
@@ -47,7 +47,7 @@ function sleep<T>(time: number, func: () => Promise<T>): Promise<T> {
 
 function _request(
   url: string,
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ): Promise<{
   statusCode: number;
   content: string;
@@ -112,7 +112,7 @@ const disableHttp2For = new Set<string>();
 
 function _http2Request(
   url: string,
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ): Promise<{
   statusCode: number;
   content: string;
@@ -154,7 +154,7 @@ function _http2Request(
           resHeaders = headers;
           log.trace(
             "Got response for download " + url + " ",
-            resHeaders[":status"]
+            resHeaders[":status"],
           );
         });
         req.on("data", (d) => content.push(d));
@@ -176,7 +176,7 @@ function _http2Request(
               log.debug(
                 "HTTP2 session failed for " +
                   origin +
-                  ". Disabling HTTP/2 for this origin"
+                  ". Disabling HTTP/2 for this origin",
               );
               disableHttp2For.add(origin);
             }
@@ -204,7 +204,7 @@ function _http2Request(
               log.warn(
                 "HTTP2 session failed for " +
                   origin +
-                  ". Disabling HTTP/2 for this origin"
+                  ". Disabling HTTP/2 for this origin",
               );
               disableHttp2For.add(origin);
             }

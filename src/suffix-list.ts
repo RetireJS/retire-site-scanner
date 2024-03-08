@@ -16,11 +16,11 @@ async function getList(): Promise<Array<string>> {
                 .split("\n")
                 .filter((n) => n.trim() != "")
                 .filter((n) => !n.includes("//"))
-                .sort((a, b) => b.length - a.length)
+                .sort((a, b) => b.length - a.length),
             );
           });
           response.on("error", (e) => reject(e));
-        }
+        },
       )
       .on("error", (e) => reject(e));
   });

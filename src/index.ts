@@ -7,6 +7,7 @@ import retire, { Component, Scanner } from "./retireWrapper";
 import { tryToGetSourceMap } from "./sourceMapResolver";
 import { clearInterval } from "timers";
 import { Page } from "puppeteer";
+import request from "./request";
 
 const stats = {
   urlCount: 0,
@@ -25,16 +26,32 @@ async function checkURL(
   scanner: Scanner,
   url: string,
   content: string,
-  initiator: string | undefined
+  initiator: string | undefined,
 ): Promise<void> {
   try {
-    log.trace(`Downloading sourcemaps for ${url} ...`);
-    const sourceMaps = shouldSkipSourcemap(url)
-      ? []
-      : await tryToGetSourceMap(url, content);
-    log.trace(`Done downloading sourcemaps for: ${url}`);
-
-    const sources = [content, ...sourceMaps];
+    const sources = [content];
+    if (!shouldSkipSourcemap(url)) {
+      log.trace(`Downloading sourcemaps for ${url} ...`);
+      const sourceMaps = await tryToGetSourceMap(url, content);
+      sources.push(...sourceMaps);
+      log.trace(`Done downloading sourcemaps for: ${url}`);
+    }
+    if (content.startsWith("/*! For license information please see")) {
+      const licenseFileName = content.split(" */")[0].split(" ").slice(-1)[0];
+      log.debug(
+        `License information found in content. Loading ${licenseFileName}`,
+      );
+      const [path, params] = url.split("?");
+      const licenseURL =
+        path.split("/").slice(0, -1).join("/") +
+        "/" +
+        licenseFileName +
+        (params ? "?" + params : "");
+      const licenseSource = await request(licenseURL);
+      if (licenseSource.statusCode === 200) {
+        sources.push(licenseSource.content);
+      }
+    }
 
     const uriResults = scanner.scanUri(url);
     const contentResults = sources
@@ -91,7 +108,7 @@ async function onService(
   domain: string,
   url: string,
   inboundContentType: string,
-  outboundContentType?: string
+  outboundContentType?: string,
 ): Promise<void> {
   services[domain] = services[domain] || [];
   services[domain].push({ url, inboundContentType, outboundContentType });
@@ -101,7 +118,7 @@ retire().then((scanner) => {
   const onJavaScript = async (
     url: string,
     contents: string,
-    initiator: string | undefined
+    initiator: string | undefined,
   ) => {
     stats.urlCount++;
     return checkURL(scanner, url, contents, initiator);
@@ -109,7 +126,7 @@ retire().then((scanner) => {
 
   const onPageLoaded = async (page: Page) => {
     const results = await scanner.runFuncs(
-      (code) => page.evaluate(code) as Promise<string | undefined>
+      (code) => page.evaluate(code) as Promise<string | undefined>,
     );
     if (results.length > 0) {
       log.logResults(page.url(), undefined, results);
@@ -126,7 +143,7 @@ retire().then((scanner) => {
     .load(urlToScan, chromiumArgs, onJavaScript, onPageLoaded, onService)
     .then(() => {
       log.info(
-        `Stats: urls: ${stats.urlCount}, libraries: ${uniqueLibraries.size}, Libraries with known vulnerabilities: ${vulnerableLibraries.size}`
+        `Stats: urls: ${stats.urlCount}, libraries: ${uniqueLibraries.size}, Libraries with known vulnerabilities: ${vulnerableLibraries.size}`,
       );
       if (log.traceEnabled() && tracer) {
         clearInterval(tracer);

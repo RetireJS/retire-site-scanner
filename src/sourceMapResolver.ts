@@ -6,7 +6,7 @@ const re = new RegExp("//# sourceMappingURL=([a-zA-Z/.0-9\\-_]+)", "g");
 
 export async function tryToGetSourceMap(
   uri: string,
-  content: string
+  content: string,
 ): Promise<Array<string>> {
   const requests = {} as Record<string, boolean>;
   let inter;
@@ -16,7 +16,7 @@ export async function tryToGetSourceMap(
         "Sourcemap request for " + uri + ":",
         Object.entries(requests)
           .filter(([, e]) => e)
-          .map(([u]) => u)
+          .map(([u]) => u),
       );
     }, 2000);
   }
@@ -35,7 +35,7 @@ export async function tryToGetSourceMap(
       u.pop();
       const p = u.join("/");
       sourceMapUrls = Array.from(
-        new Set(Array.from(m).map((x) => p + "/" + x[1]))
+        new Set(Array.from(m).map((x) => p + "/" + x[1])),
       );
     }
     const sources: string[] = [];
@@ -49,7 +49,7 @@ export async function tryToGetSourceMap(
         !(res.contentType || "").startsWith("text/html")
       ) {
         log.debug(
-          `Found source map at URL: ${u} ${res.statusCode} ${res.contentType}`
+          `Found source map at URL: ${u} ${res.statusCode} ${res.contentType}`,
         );
         sources.push(res.content);
       }

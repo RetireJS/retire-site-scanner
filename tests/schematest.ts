@@ -14,7 +14,7 @@ describe("cyclonedx-json", () => {
     const validator = new Validator();
     validator.addSchema(
       jsfSchema,
-      "jsf-0.82.schema.json#/definitions/signature"
+      "jsf-0.82.schema.json#/definitions/signature",
     );
     const result = validator.validate(cycloneDx, jsonSchema);
     expect(result.valid).to.eq(true);
