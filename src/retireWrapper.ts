@@ -28,31 +28,31 @@ async function loadRetireJSRepo() {
 
 function scanUri(repo: Repository, uri: string): Array<Component> {
   const uriResults = retire.scanUri(uri, repo);
-  return convertResults(uriResults || [], "scanning the URL");
+  const fileName = uri.split("/").slice(-1)[0].split("?")[0];
+  const fileNameResults = retire.scanFileName(fileName, repo);
+  return convertResults(uriResults.concat(fileNameResults), "scanning the URL");
 }
 
 function scanContent(repo: Repository, contents: string): Array<Component> {
   const contentResults = retire.scanFileContent(contents, repo, hasher);
   const deepScanResults = deepScan(contents, repo);
-  const combined = contentResults.concat(deepScanResults).reduce((acc, c) => {
-    if (
-      !acc.some((a) => a.component === c.component && a.version === c.version)
-    ) {
-      acc.push(c);
-    }
-    return acc;
-  }, [] as Component[]);
-
+  const combined = contentResults.concat(deepScanResults);
   return convertResults(combined || [], "scanning content");
 }
 
 function convertResults(
-  res: Component[],
+  data: Component[],
   detectedBy: string,
 ): Array<Component> {
-  res.forEach((r) => {
-    r.detection = r.detection ?? detectedBy;
-  });
+  const res = data.reduce((acc, c) => {
+    if (
+      !acc.some((a) => a.component === c.component && a.version === c.version)
+    ) {
+      c.detection = c.detection ?? detectedBy;
+      acc.push(c);
+    }
+    return acc;
+  }, [] as Component[]);
   return res;
 }
 

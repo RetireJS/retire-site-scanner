@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+Add file name scanning
+
 ## 1.1.0
 
 Add AST scanning
