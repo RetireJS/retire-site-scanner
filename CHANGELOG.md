@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+Add AST scanning
+
 ## 1.0.5
 
 Add support for .js.LICENSE.txt 
