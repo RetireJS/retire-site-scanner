@@ -1,6 +1,6 @@
 type LogLevel = "DBG" | "INF" | "ERR" | "WRN" | "TRC";
 import crypto, { randomUUID } from "crypto";
-import { Component } from "./retireWrapper";
+import { Component } from "retire/lib/types";
 import { unique } from "./utils";
 
 const logId = crypto.randomUUID().split("-").slice(-1)[0];
@@ -173,12 +173,12 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
   });
   resultToConvert.components.forEach((res) => {
     res.results.forEach((c) => {
-      const key = c.name + "@" + c.version;
+      const key = c.component + "@" + c.version;
       const found = components.has(key);
       const comp: CycloneDXComponent = components.get(key) || {
         type: "library",
         "bom-ref": randomUUID(),
-        name: c.name,
+        name: c.component,
         version: c.version,
         properties: [],
       };
@@ -191,7 +191,7 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
       )
         comp.properties.push({ name: "initiator", value: res.initiator });
       if (!found) {
-        c.vulnerabilities.forEach((v) => {
+        (c.vulnerabilities ?? []).forEach((v) => {
           const ids = ([] as Array<string | undefined>)
             .concat(v.identifiers?.CVE || [])
             .concat([v.identifiers?.bug, v.identifiers?.issue])
@@ -294,7 +294,7 @@ export const consoleLogger: Logger = {
     results: Array<Component>,
   ) => {
     const vulnerableLibs = results.filter(
-      (lib) => lib.vulnerabilities.length > 0,
+      (lib) => (lib.vulnerabilities ?? []).length > 0,
     );
     if (vulnerableLibs.length > 0) {
       logMsg(
@@ -305,10 +305,12 @@ export const consoleLogger: Logger = {
         }:`,
       );
       vulnerableLibs.forEach((l) => {
-        logMsg(console.warn, "WRN", ` * ${l.name}@${l.version}`);
+        logMsg(console.warn, "WRN", ` * ${l.component}@${l.version}`);
       });
     }
-    const otherLibs = results.filter((lib) => lib.vulnerabilities.length == 0);
+    const otherLibs = results.filter(
+      (lib) => (lib.vulnerabilities ?? []).length == 0,
+    );
     if (otherLibs.length > 0) {
       logMsg(
         console.warn,
@@ -316,7 +318,7 @@ export const consoleLogger: Logger = {
         `Other libraries found in ${url} loaded by ${initiator ?? "page"}:`,
       );
       otherLibs.forEach((l) => {
-        logMsg(console.warn, "INF", ` * ${l.name}@${l.version}`);
+        logMsg(console.warn, "INF", ` * ${l.component}@${l.version}`);
       });
     }
   },

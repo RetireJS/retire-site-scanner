@@ -3,7 +3,8 @@
 import browser from "./browser";
 
 import log, { Services, useJson } from "./log";
-import retire, { Component, Scanner } from "./retireWrapper";
+import retire, { Scanner } from "./retireWrapper";
+import { Component } from "retire/lib/types";
 import { tryToGetSourceMap } from "./sourceMapResolver";
 import { clearInterval } from "timers";
 import { Page } from "puppeteer";
@@ -60,15 +61,15 @@ async function checkURL(
     const mRes = new Map<string, Component>();
     uriResults
       .concat(contentResults)
-      .forEach((c) => mRes.set(`${c.name}@${c.version}`, c));
+      .forEach((c) => mRes.set(`${c.component}@${c.version}`, c));
     const results = Array.from(mRes.values());
     if (results.length > 0) {
       log.logResults(url, initiator, results);
     }
     results.forEach((r) => {
-      const key = r.name + "@" + r.version;
+      const key = r.component + "@" + r.version;
       uniqueLibraries.add(key);
-      if (r.vulnerabilities.length > 0) vulnerableLibraries.add(key);
+      if ((r.vulnerabilities ?? []).length > 0) vulnerableLibraries.add(key);
     });
     return;
   } catch (err) {
@@ -133,9 +134,9 @@ retire().then((scanner) => {
     }
     log.logServices(services);
     results.forEach((r) => {
-      const key = r.name + "@" + r.version;
+      const key = r.component + "@" + r.version;
       uniqueLibraries.add(key);
-      if (r.vulnerabilities.length > 0) vulnerableLibraries.add(key);
+      if ((r.vulnerabilities ?? []).length > 0) vulnerableLibraries.add(key);
     });
   };
 

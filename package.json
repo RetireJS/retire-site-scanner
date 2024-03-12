@@ -24,7 +24,7 @@
   "dependencies": {
     "cacheable-lookup": "^7.0.0",
     "puppeteer": "^22.4.0",
-    "retire": "^4.3.1",
+    "retire": "^5.0.0-beta.1",
     "source-map": "^0.7.4"
   },
   "devDependencies": {

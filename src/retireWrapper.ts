@@ -1,6 +1,7 @@
 const loadrepository = require("retire/lib/repo").loadrepository;
-import { type Vulnerability } from "retire/lib/types";
-const retire = require("retire/lib/retire");
+import retire from "retire/lib/retire";
+import { deepScan } from "retire/lib/deepscan";
+import { type Repository, type Component } from "retire/lib/types";
 import crypto from "crypto";
 import log from "./log";
 import { unique } from "./utils";
@@ -20,64 +21,51 @@ const hasher = {
 
 async function loadRetireJSRepo() {
   return await loadrepository(
-    "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json",
+    "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v2.json",
     retireOptions,
   );
 }
 
-export type Component = {
-  name: string;
-  version: string;
-  vulnerabilities: Array<Vulnerability>;
-  detectedBy: string;
-};
-
-function scanUri(repo: unknown, uri: string): Array<Component> {
+function scanUri(repo: Repository, uri: string): Array<Component> {
   const uriResults = retire.scanUri(uri, repo);
   return convertResults(uriResults || [], "scanning the URL");
 }
 
-function scanContent(repo: unknown, contents: string): Array<Component> {
+function scanContent(repo: Repository, contents: string): Array<Component> {
   const contentResults = retire.scanFileContent(contents, repo, hasher);
-  return convertResults(contentResults || [], "scanning content");
+  const deepScanResults = deepScan(contents, repo);
+  const combined = contentResults.concat(deepScanResults).reduce((acc, c) => {
+    if (
+      !acc.some((a) => a.component === c.component && a.version === c.version)
+    ) {
+      acc.push(c);
+    }
+    return acc;
+  }, [] as Component[]);
+
+  return convertResults(combined || [], "scanning content");
 }
 
-function convertResults(res: unknown, detectedBy: string): Array<Component> {
-  // @ts-ignore
-  return res.map((r) => {
-    return {
-      name: r.component,
-      version: r.version,
-      // @ts-ignore
-      vulnerabilities: (r.vulnerabilities || []).map((v) => ({
-        severity: v.severity || "unknown",
-        identifiers: v.identifiers || {},
-        info: v.info || [],
-      })),
-      detectedBy,
-    };
+function convertResults(
+  res: Component[],
+  detectedBy: string,
+): Array<Component> {
+  res.forEach((r) => {
+    r.detection = r.detection ?? detectedBy;
   });
+  return res;
 }
 
-function getFuncs(repo: unknown): Record<string, string[]> {
-  //@ts-ignore
-  return Object.entries(repo)
-    .map(([k, des]) => {
-      //@ts-ignore
-      return [k, des.extractors.func];
-    })
-    .filter(([, funcs]) => funcs && funcs.length > 0)
-    .reduce(
-      (a, [k, funcs]) => {
-        a[k] = funcs;
-        return a;
-      },
-      {} as Record<string, string[]>,
-    );
+function getFuncs(repo: Repository): Record<string, string[]> {
+  return Object.fromEntries(
+    Object.entries(repo)
+      .map(([k, des]) => [k, des.extractors.func])
+      .filter(([, funcs]) => funcs && funcs.length > 0),
+  );
 }
 
 function check(
-  repo: unknown,
+  repo: Repository,
   version: string,
   component: string,
 ): Array<Component> {
@@ -86,7 +74,7 @@ function check(
 }
 
 async function runFuncs(
-  repo: unknown,
+  repo: Repository,
   evaluate: Evaluator,
 ): Promise<Array<Component>> {
   const funcs = getFuncs(repo);
