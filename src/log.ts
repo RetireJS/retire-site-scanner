@@ -297,16 +297,31 @@ export const consoleLogger: Logger = {
       (lib) => (lib.vulnerabilities ?? []).length > 0,
     );
     if (vulnerableLibs.length > 0) {
-      logMsg(
-        console.warn,
-        "WRN",
-        `Libraries with known vulnerabilities found in ${url} loaded by ${
-          initiator ?? "page"
-        }:`,
-      );
-      vulnerableLibs.forEach((l) => {
-        logMsg(console.warn, "WRN", ` * ${l.component}@${l.version}`);
-      });
+      const backdoorVulns = vulnerableLibs.filter(x => x.vulnerabilities?.some(v => v.cwe?.includes("CWE-506")));
+      const otherVulns = vulnerableLibs.filter(x => x.vulnerabilities?.some(v => !v.cwe?.every(s => s == "CWE-506")));
+
+      if (backdoorVulns.length > 0) {
+        logMsg(
+          console.warn,
+          "WRN",
+          `Possibly backdoored libraries found in ${url} loaded by ${
+            initiator ?? "page"
+          }`,
+        );
+      }
+
+      if (otherVulns.length > 0) {
+        logMsg(
+          console.warn,
+          "WRN",
+          `Libraries with known vulnerabilities found in ${url} loaded by ${
+            initiator ?? "page"
+          }:`,
+        );
+        vulnerableLibs.forEach((l) => {
+          logMsg(console.warn, "WRN", ` * ${l.component}@${l.version}`);
+        });
+      }
     }
     const otherLibs = results.filter(
       (lib) => (lib.vulnerabilities ?? []).length == 0,

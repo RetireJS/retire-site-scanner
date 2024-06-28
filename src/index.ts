@@ -140,8 +140,16 @@ retire().then((scanner) => {
     });
   };
 
+  async function checkRequestTarget(url: string, headers: Record<string, string>): Promise<void> {
+    const results = scanner.scanUrlBackdoored(url);
+    if (results.length > 0) {
+      log.logResults(url, undefined, results);
+    }
+  }
+
+
   browser
-    .load(urlToScan, chromiumArgs, onJavaScript, onPageLoaded, onService)
+    .load(urlToScan, chromiumArgs, onJavaScript, onPageLoaded, onService, checkRequestTarget)
     .then(() => {
       log.info(
         `Stats: urls: ${stats.urlCount}, libraries: ${uniqueLibraries.size}, Libraries with known vulnerabilities: ${vulnerableLibraries.size}`,

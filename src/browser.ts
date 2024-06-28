@@ -32,6 +32,7 @@ async function loadPage(
   onJavaScript: JavaScriptCallback,
   onPageLoaded: (page: Page) => Promise<void>,
   onServiceInvoked: ServiceCallback,
+  onRequest: (url: string, headers: Record<string, string>) => Promise<void>,
 ) {
   const page = await browser.newPage();
   try {
@@ -42,7 +43,10 @@ async function loadPage(
     await page.setUserAgent(UserAgent);
     await page.setCacheEnabled(false);
     const urlDomain = await getDomain(url, url);
-
+    page.on("request", async (request) => { 
+      if (request.method() != "GET") return;
+      onRequest(request.url(), request.headers());
+    });
     page.on("response", async (response) => {
       const contentType = response.headers()["content-type"] ?? "";
       if (
@@ -140,6 +144,7 @@ async function load(
   onJavaScript: JavaScriptCallback,
   onPageLoaded: (page: Page) => Promise<void>,
   onServiceInvoked: ServiceCallback,
+  onRequest: (url: string, headers: Record<string, string>) => Promise<void>,
 ) {
   log.info("Launching browser...");
   const browser = await puppeteer.launch({
@@ -157,6 +162,7 @@ async function load(
         onJavaScript,
         onPageLoaded,
         onServiceInvoked,
+        onRequest
       );
       break;
     } catch (error) {
