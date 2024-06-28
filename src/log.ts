@@ -297,8 +297,12 @@ export const consoleLogger: Logger = {
       (lib) => (lib.vulnerabilities ?? []).length > 0,
     );
     if (vulnerableLibs.length > 0) {
-      const backdoorVulns = vulnerableLibs.filter(x => x.vulnerabilities?.some(v => v.cwe?.includes("CWE-506")));
-      const otherVulns = vulnerableLibs.filter(x => x.vulnerabilities?.some(v => !v.cwe?.every(s => s == "CWE-506")));
+      const backdoorVulns = vulnerableLibs.filter((x) =>
+        x.vulnerabilities?.some((v) => v.cwe?.includes("CWE-506")),
+      );
+      const otherVulns = vulnerableLibs.filter((x) =>
+        x.vulnerabilities?.some((v) => !v.cwe?.every((s) => s == "CWE-506")),
+      );
 
       if (backdoorVulns.length > 0) {
         logMsg(

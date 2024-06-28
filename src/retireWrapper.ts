@@ -1,16 +1,10 @@
-const loadrepository = require("retire/lib/repo").loadrepository;
 import retire from "retire/lib/retire";
 import { deepScan } from "retire/lib/deepscan";
 import { type Repository, type Component } from "retire/lib/types";
 import crypto from "crypto";
 import log from "./log";
 import { unique } from "./utils";
-import path from "path";
-import os from "os";
 import * as https from "https";
-
-const cachedir = path.resolve(os.tmpdir(), ".retire-cache/");
-const retireOptions = { log, cachedir };
 
 const hasher = {
   sha1: function (data: string) {
@@ -20,40 +14,45 @@ const hasher = {
   },
 };
 
-
-
-type CombinedRepository = { 
-  advisories: Repository, 
-  backdoored: Record<string, Array<{
-    summary: string,
-    severity: string,
-    extractors: string[],
-    info: string[]
-  }>>
+type CombinedRepository = {
+  advisories: Repository;
+  backdoored: Record<
+    string,
+    Array<{
+      summary: string;
+      severity: string;
+      extractors: string[];
+      info: string[];
+    }>
+  >;
 };
 
-async function loadRetireJSRepo() : Promise<CombinedRepository>{
-  return new Promise((resolve,reject) => {
-    https.get("https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v3.json", (res) => {
-      let data = [] as Buffer[];
-      res.on("data", (d) => data.push(d));
-      res.on("end", () => {
-        const repoData = Buffer.concat(data).toString();
-        const versioned = retire.replaceVersion(repoData);
-        const repo = JSON.parse(versioned);
-        resolve(repo);
-      });
-      res.on("error", (err) => reject(err));
-    });
+async function loadRetireJSRepo(): Promise<CombinedRepository> {
+  return new Promise((resolve, reject) => {
+    https.get(
+      "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v3.json",
+      (res) => {
+        const data = [] as Buffer[];
+        res.on("data", (d) => data.push(d));
+        res.on("end", () => {
+          const repoData = Buffer.concat(data).toString();
+          const versioned = retire.replaceVersion(repoData);
+          const repo = JSON.parse(versioned);
+          resolve(repo);
+        });
+        res.on("error", (err) => reject(err));
+      },
+    );
   });
 }
 
-
-
-function scanUrlBackdoored(repo: CombinedRepository, url: string) : Array<Component> {
+function scanUrlBackdoored(
+  repo: CombinedRepository,
+  url: string,
+): Array<Component> {
   log.trace("Scanning URL for backdoors:", url);
   const backdoorData = repo.backdoored;
-  const matches = Object.entries(backdoorData).filter(([title, advisories]) => {
+  const matches = Object.entries(backdoorData).filter(([, advisories]) => {
     return advisories.some((advisory) => {
       return advisory.extractors.some((e) => {
         return new RegExp(e).test(url);
@@ -80,7 +79,6 @@ function scanUrlBackdoored(repo: CombinedRepository, url: string) : Array<Compon
   });
   return convertResults(remapped, "scanning the URL");
 }
-
 
 function scanUri(repo: CombinedRepository, uri: string): Array<Component> {
   const uriResults = retire.scanUri(uri, repo.advisories);
@@ -170,7 +168,8 @@ const scanner = () =>
     (repo) =>
       ({
         scanUri: (uri: string) => scanUri(repo, uri),
-        scanContent: (contents: string) => scanContent(repo.advisories, contents),
+        scanContent: (contents: string) =>
+          scanContent(repo.advisories, contents),
         runFuncs: (evaluate: Evaluator) => runFuncs(repo.advisories, evaluate),
         scanUrlBackdoored: (url: string) => scanUrlBackdoored(repo, url),
       }) as Scanner,

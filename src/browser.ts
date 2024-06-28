@@ -43,7 +43,7 @@ async function loadPage(
     await page.setUserAgent(UserAgent);
     await page.setCacheEnabled(false);
     const urlDomain = await getDomain(url, url);
-    page.on("request", async (request) => { 
+    page.on("request", async (request) => {
       if (request.method() != "GET") return;
       onRequest(request.url(), request.headers());
     });
@@ -162,7 +162,7 @@ async function load(
         onJavaScript,
         onPageLoaded,
         onServiceInvoked,
-        onRequest
+        onRequest,
       );
       break;
     } catch (error) {
