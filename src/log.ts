@@ -8,12 +8,12 @@ let color = false;
 
 function logMsg(logger: () => void, level: LogLevel, ...args: Array<unknown>) {
   if (level == "WRN" && color) {
-    args.push("\x1b[0m");
-    // @ts-ignore
-    logger("\x1b[31m" + new Date().toISOString(), logId, level, ...args);
-  } else {
-    // @ts-ignore
-    logger(new Date().toISOString(), logId, level, ...args);
+    process.stdout.write("\x1b[31m");
+  }
+  // @ts-ignore
+  logger(new Date().toISOString(), logId, level, ...args);
+  if (level == "WRN" && color) {
+    process.stdout.write("\x1b[0m");
   }
 }
 let level = "INF";
