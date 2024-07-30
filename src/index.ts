@@ -56,7 +56,7 @@ async function checkURL(
 
     const uriResults = scanner.scanUri(url);
     const contentResults = sources
-      .map((c) => scanner.scanContent(c))
+      .map((c) => scanner.scanContent(url, c))
       .reduce((a, b) => a.concat(b), []);
     const mRes = new Map<string, Component>();
     uriResults
@@ -83,7 +83,7 @@ if (!urlToScan) {
   console.warn("ERROR: No url given");
   process.exit(1);
 }
-const knownArgs = ["--sbom", "-v", "-vv", "--docker"];
+const knownArgs = ["--sbom", "-v", "-vv", "--docker", "--color"];
 const unknownArgs = process.argv
   .filter((x) => x.startsWith("-"))
   .filter((x) => !knownArgs.includes(x));
@@ -95,6 +95,7 @@ if (unknownArgs.length > 0) {
 if (process.argv.includes("--sbom")) useJson();
 if (process.argv.includes("-v")) log.setLevel("DBG");
 if (process.argv.includes("-vv")) log.setLevel("TRC");
+if (process.argv.includes("--color")) log.enableColor();
 log.open(urlToScan);
 
 let chromiumArgs: Array<string> = [];

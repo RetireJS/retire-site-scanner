@@ -87,9 +87,22 @@ function scanUri(repo: CombinedRepository, uri: string): Array<Component> {
   return convertResults(uriResults.concat(fileNameResults), "scanning the URL");
 }
 
-function scanContent(repo: Repository, contents: string): Array<Component> {
+function doDeepScan(contents: string, repo: Repository, url: string) {
+  try {
+    return deepScan(contents, repo);
+  } catch (err) {
+    log.debug("Error during deep scan of " + url, err);
+    return [];
+  }
+}
+
+function scanContent(
+  repo: Repository,
+  contents: string,
+  url: string,
+): Array<Component> {
   const contentResults = retire.scanFileContent(contents, repo, hasher);
-  const deepScanResults = deepScan(contents, repo);
+  const deepScanResults = doDeepScan(contents, repo, url);
   const combined = contentResults.concat(deepScanResults);
   return convertResults(combined || [], "scanning content");
 }
@@ -158,7 +171,7 @@ type Evaluator = (code: string) => Promise<string | undefined>;
 
 export type Scanner = {
   scanUri: (uri: string) => Array<Component>;
-  scanContent: (contents: string) => Array<Component>;
+  scanContent: (url: string, contents: string) => Array<Component>;
   runFuncs: (evaluate: Evaluator) => Promise<Array<Component>>;
   scanUrlBackdoored: (url: string) => Array<Component>;
 };
@@ -168,8 +181,8 @@ const scanner = () =>
     (repo) =>
       ({
         scanUri: (uri: string) => scanUri(repo, uri),
-        scanContent: (contents: string) =>
-          scanContent(repo.advisories, contents),
+        scanContent: (url: string, contents: string) =>
+          scanContent(repo.advisories, contents, url),
         runFuncs: (evaluate: Evaluator) => runFuncs(repo.advisories, evaluate),
         scanUrlBackdoored: (url: string) => scanUrlBackdoored(repo, url),
       }) as Scanner,

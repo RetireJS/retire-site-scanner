@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+* Add support for color output via --color
+* Move parsing errors for deepscan to debug
+
 ## 1.2.0
 
 Add support for detecting the use of known bad CDNs.

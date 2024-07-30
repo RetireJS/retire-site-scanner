@@ -4,10 +4,17 @@ import { Component } from "retire/lib/types";
 import { unique } from "./utils";
 
 const logId = crypto.randomUUID().split("-").slice(-1)[0];
+let color = false;
 
 function logMsg(logger: () => void, level: LogLevel, ...args: Array<unknown>) {
-  // @ts-ignore
-  logger(new Date().toISOString(), logId, level, ...args);
+  if (level == "WRN" && color) {
+    args.push("\x1b[0m");
+    // @ts-ignore
+    logger("\x1b[31m" + new Date().toISOString(), logId, level, ...args);
+  } else {
+    // @ts-ignore
+    logger(new Date().toISOString(), logId, level, ...args);
+  }
 }
 let level = "INF";
 
@@ -22,6 +29,7 @@ export type Services = Record<
 
 type Logger = {
   open: (url: string) => void;
+  enableColor: () => void;
   trace: (...args: Array<unknown>) => void;
   debug: (...args: Array<unknown>) => void;
   info: (...args: Array<unknown>) => void;
@@ -244,6 +252,7 @@ export const jsonLogger: Logger = {
   open: (url: string) => {
     collectedResults.url = url;
   },
+  enableColor: () => {},
   trace: (...args: Array<unknown>) => {
     if (level == "TRC") logMsg(console.warn, "TRC", ...args);
   },
@@ -274,6 +283,9 @@ export const jsonLogger: Logger = {
 export const consoleLogger: Logger = {
   open: () => {
     return;
+  },
+  enableColor: () => {
+    color = true;
   },
   trace: (...args: Array<unknown>) => {
     if (level == "TRC") logMsg(console.log, "TRC", ...args);
