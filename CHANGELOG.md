@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+* Add purl to SBOM output
+
 ## 1.3.0
 
 * Add support for color output via --color

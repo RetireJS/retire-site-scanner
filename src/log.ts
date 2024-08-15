@@ -70,6 +70,7 @@ type CycloneDXComponent = {
   name: string;
   version: string;
   "bom-ref": string;
+  purl?: string;
   properties: Array<{
     name: string;
     value: string;
@@ -164,6 +165,11 @@ function formatContentTypes(
     .join(" ");
 }
 
+function generatePURL(component: Component): string {
+  if (component.basePurl) return component.basePurl + "@" + component.version;
+  return `pkg:npm/${component.npmname ?? component.component}@${component.version}`;
+}
+
 export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
   const components = new Map<string, CycloneDXComponent>();
   const vulnerabilities: Array<CycloneDXVulnerability> = [];
@@ -188,6 +194,7 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
         "bom-ref": randomUUID(),
         name: c.component,
         version: c.version,
+        purl: generatePURL(c),
         properties: [],
       };
       components.set(key, comp);
