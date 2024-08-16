@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+### Bugfix 
+
+* Fix bug related to deepscans in retire.js
+
 ## 1.4.0
 
 * Add purl to SBOM output

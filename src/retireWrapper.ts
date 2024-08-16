@@ -83,7 +83,7 @@ function scanUrlBackdoored(
 function scanUri(repo: CombinedRepository, uri: string): Array<Component> {
   const uriResults = retire.scanUri(uri, repo.advisories);
   const fileName = uri.split("/").slice(-1)[0].split("?")[0];
-  const fileNameResults = retire.scanFileName(fileName, repo.advisories);
+  const fileNameResults = retire.scanFileName(fileName, repo.advisories, false);
   return convertResults(uriResults.concat(fileNameResults), "scanning the URL");
 }
 
