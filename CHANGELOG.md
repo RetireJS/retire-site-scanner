@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+### Enhancement
+
+* Improve CycloneDX vulnerability IDs
+
 ## 1.4.1
 
 ### Bugfix 
