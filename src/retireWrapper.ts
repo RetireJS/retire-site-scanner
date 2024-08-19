@@ -1,5 +1,6 @@
 import retire from "retire/lib/retire";
 import { deepScan } from "retire/lib/deepscan";
+import { evaluateLicense } from "retire/lib/license";
 import { type Repository, type Component } from "retire/lib/types";
 import crypto from "crypto";
 import log from "./log";
@@ -180,12 +181,31 @@ const scanner = () =>
   loadRetireJSRepo().then(
     (repo) =>
       ({
-        scanUri: (uri: string) => scanUri(repo, uri),
+        scanUri: (uri: string) =>
+          addLicenses(scanUri(repo, uri), repo.advisories),
         scanContent: (url: string, contents: string) =>
-          scanContent(repo.advisories, contents, url),
-        runFuncs: (evaluate: Evaluator) => runFuncs(repo.advisories, evaluate),
-        scanUrlBackdoored: (url: string) => scanUrlBackdoored(repo, url),
+          addLicenses(
+            scanContent(repo.advisories, contents, url),
+            repo.advisories,
+          ),
+        runFuncs: (evaluate: Evaluator) =>
+          runFuncs(repo.advisories, evaluate).then((r) => {
+            addLicenses(r, repo.advisories);
+            return r;
+          }),
+        scanUrlBackdoored: (url: string) =>
+          addLicenses(scanUrlBackdoored(repo, url), repo.advisories),
       }) as Scanner,
   );
+
+function addLicenses(components: Component[], repo: Repository) {
+  components.forEach((c) => {
+    const possibleLicenses = repo[c.component]?.licenses;
+    if (possibleLicenses) {
+      c.licenses = evaluateLicense(possibleLicenses, c.version);
+    }
+  });
+  return components;
+}
 
 export default scanner;

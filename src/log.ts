@@ -71,6 +71,12 @@ type CycloneDXComponent = {
   version: string;
   "bom-ref": string;
   purl?: string;
+  licenses?: Array<{
+    license?: {
+      name: string;
+    };
+    expression?: string;
+  }>;
   properties: Array<{
     name: string;
     value: string;
@@ -196,6 +202,7 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
         version: c.version,
         purl: generatePURL(c),
         properties: [],
+        licenses: mapLicenses(c.licenses),
       };
       components.set(key, comp);
       if (!comp.properties.some((c) => c.value == res.url))
@@ -263,6 +270,14 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
     vulnerabilities: Array.from(vulnerabilities.values()),
   };
 }
+
+function mapLicenses(licenses: string[] | undefined) {
+  if (!licenses) return [];
+  if (licenses.length == 0) return [];
+  if (licenses[0] == "commercial") return [{ license: { name: "Commercial" } }];
+  return [{ expression: licenses[0] }];
+}
+
 
 export const jsonLogger: Logger = {
   open: (url: string) => {

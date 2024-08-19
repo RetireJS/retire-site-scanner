@@ -17,6 +17,9 @@ describe("cyclonedx-json", () => {
       "jsf-0.82.schema.json#/definitions/signature",
     );
     const result = validator.validate(cycloneDx, jsonSchema);
+    if (!result.valid) {
+      console.log(result.errors);
+    }
     expect(result.valid).to.eq(true);
   });
 });
