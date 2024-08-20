@@ -95,6 +95,7 @@ type CycloneDXVulnerability = {
   ratings: Array<{
     severity: string;
   }>;
+  cwes: Array<number>;
   description?: string;
   advisories?: Array<{
     url: string;
@@ -255,7 +256,9 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
             advisories: v.info.map((u) => ({ url: u })),
             id: id,
             ratings: [{ severity: v.severity }],
+            description: v.identifiers.summary,
             references: otherRefs.length > 0 ? otherRefs : undefined,
+            cwes: v.cwe?.map((c) => parseInt(c.split("-")[1], 10)),
             affects: [
               {
                 ref: comp["bom-ref"],

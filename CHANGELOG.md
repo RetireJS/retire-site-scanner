@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+
+### Bugfix
+
+* Add missing CWEs in SBOM output
 
 ## 1.6.1
 
