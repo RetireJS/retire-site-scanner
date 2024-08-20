@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.3
+
+### Bugfix
+
+* Fix encoding of PURLs in SBOM output
+
 ## 1.6.2
 
 ### Bugfix

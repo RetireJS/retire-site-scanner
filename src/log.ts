@@ -1,6 +1,7 @@
 type LogLevel = "DBG" | "INF" | "ERR" | "WRN" | "TRC";
 import crypto, { randomUUID } from "crypto";
 import { Component } from "retire/lib/types";
+import { generatePURL } from "retire/lib/reporters/utils";
 import { unique } from "./utils";
 const pjson = require("../package.json");
 
@@ -186,11 +187,6 @@ function formatContentTypes(
   ]
     .filter((x) => x != "")
     .join(" ");
-}
-
-function generatePURL(component: Component): string {
-  if (component.basePurl) return component.basePurl + "@" + component.version;
-  return `pkg:npm/${component.npmname ?? component.component}@${component.version}`;
 }
 
 export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
