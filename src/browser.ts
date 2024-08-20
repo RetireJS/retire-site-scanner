@@ -149,7 +149,7 @@ async function load(
   log.info("Launching browser...");
   const browser = await puppeteer.launch({
     headless: "shell",
-    ignoreHTTPSErrors: true,
+    acceptInsecureCerts: true,
     args: [...defaultArgs, ...chromiumArgs],
   });
   let attempts = 0;
