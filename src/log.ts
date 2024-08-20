@@ -2,6 +2,7 @@ type LogLevel = "DBG" | "INF" | "ERR" | "WRN" | "TRC";
 import crypto, { randomUUID } from "crypto";
 import { Component } from "retire/lib/types";
 import { unique } from "./utils";
+const pjson = require("../package.json");
 
 const logId = crypto.randomUUID().split("-").slice(-1)[0];
 let color = false;
@@ -83,7 +84,7 @@ type CycloneDXComponent = {
   }>;
 };
 type CycloneDXVulnerability = {
-  "bom-ref": string;
+  "bom-ref"?: string;
   id: string;
   references?: Array<{
     id: string;
@@ -97,6 +98,21 @@ type CycloneDXVulnerability = {
   description?: string;
   advisories?: Array<{
     url: string;
+  }>;
+  affects: Array<{
+    ref: string;
+    versions: Array<
+      | {
+          version: string;
+          range?: string;
+          status?: "affected" | "unaffected" | "unknown";
+        }
+      | {
+          version?: string;
+          range: string;
+          status?: "affected" | "unaffected" | "unknown";
+        }
+    >;
   }>;
 };
 
@@ -235,11 +251,17 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
               source: { url: `https://nvd.nist.gov/vuln/detail/${i}` },
             }));
           vulnerabilities.push({
-            "bom-ref": comp["bom-ref"],
+            "bom-ref": randomUUID(),
             advisories: v.info.map((u) => ({ url: u })),
             id: id,
             ratings: [{ severity: v.severity }],
             references: otherRefs.length > 0 ? otherRefs : undefined,
+            affects: [
+              {
+                ref: comp["bom-ref"],
+                versions: [{ version: c.version }],
+              },
+            ],
           });
         });
       }
@@ -252,7 +274,7 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
     version: 1,
     metadata: {
       timestamp: started,
-      tools: [{ name: "retire-scanner" }],
+      tools: [{ name: pjson.name, version: pjson.version }],
       component: {
         type: "application",
         name: resultToConvert.url,
@@ -277,7 +299,6 @@ function mapLicenses(licenses: string[] | undefined) {
   if (licenses[0] == "commercial") return [{ license: { name: "Commercial" } }];
   return [{ expression: licenses[0] }];
 }
-
 
 export const jsonLogger: Logger = {
   open: (url: string) => {

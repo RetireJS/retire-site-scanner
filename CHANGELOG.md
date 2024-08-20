@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.5.0
+
+## 1.6.1
+
+### Bugfix
+
+* Broken references in SBOM output
+
+## 1.6.0
 
 ### Enhancement
 
