@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.4
+
+### Improvements
+
+* Add dependencies to CycloneDX
+
+
+### Bugfix
+
+* Try to fix download speed for source maps
+
 ## 1.6.3
 
 ### Bugfix
