@@ -267,6 +267,7 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
     });
   });
   return {
+    $schema: "http://cyclonedx.org/schema/bom-1.4.schema.json",
     bomFormat: "CycloneDX",
     specVersion: "1.4",
     serialNumber: "urn:uuid:" + randomUUID(),
@@ -277,10 +278,17 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
       component: {
         type: "application",
         name: resultToConvert.url,
+        version: `${Date.now()}`,
         "bom-ref": bomRef,
       },
     },
     components: Array.from(components.values()),
+    dependencies: [
+      {
+        ref: bomRef,
+        dependsOn: Array.from(components.values()).map((c) => c["bom-ref"]),
+      },
+    ],
     compositions: [
       {
         aggregate: "unknown",

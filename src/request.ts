@@ -78,7 +78,12 @@ function _request(
         .request(url, defaultOptions, (res) => {
           log.trace("Got response for download " + url + " " + res.statusCode);
           const content: Array<Buffer> = [];
-          res.on("data", (d) => content.push(d));
+          res.on("error", (err) => {
+            log.warn(err);
+          });
+          res.on("data", (d) => {
+            content.push(d);
+          });
           res.on("end", () => {
             resolve({
               statusCode: res.statusCode || 404,
@@ -148,7 +153,8 @@ function _http2Request(
         req.setTimeout(3000, () => {
           req.close(http2.constants.NGHTTP2_CANCEL);
         });
-        req.end();
+
+        //req.setEncoding("utf8");
         let resHeaders: IncomingHttpHeaders & IncomingHttpStatusHeader = {};
         req.on("response", (headers) => {
           resHeaders = headers;
@@ -157,7 +163,10 @@ function _http2Request(
             resHeaders[":status"],
           );
         });
-        req.on("data", (d) => content.push(d));
+        const content: Array<Buffer> = [];
+        req.on("data", (d) => {
+          content.push(d);
+        });
         req.on("end", () => {
           resolve({
             statusCode: resHeaders[":status"] || 404,
@@ -165,7 +174,6 @@ function _http2Request(
             contentType: resHeaders["content-type"],
           });
         });
-        const content: Array<Buffer> = [];
         req.on("error", (err) => {
           if (
             err.errno == -505 ||
@@ -187,11 +195,15 @@ function _http2Request(
             reject(err);
           }
         });
+        req.end();
       };
 
       if (!sessions[origin]) {
         sessions[origin] = http2.connect(origin, {
           rejectUnauthorized: false,
+          settings: {
+            initialWindowSize: 1024 * 1024 * 10,
+          },
         });
         sessions[origin].on("error", (err) => {
           delete sessions[origin];

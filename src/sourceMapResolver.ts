@@ -29,6 +29,7 @@ export async function tryToGetSourceMap(
       }
       return uri + s;
     });
+
     if (content.includes("//# sourceMappingURL=")) {
       const m = content.matchAll(re);
       const u = uri.split("/");
@@ -38,6 +39,7 @@ export async function tryToGetSourceMap(
         new Set(Array.from(m).map((x) => p + "/" + x[1])),
       );
     }
+
     const sources: string[] = [];
     for (const u of sourceMapUrls) {
       log.trace(`Trying source map URL: ${u}`);
@@ -54,6 +56,7 @@ export async function tryToGetSourceMap(
         sources.push(res.content);
       }
     }
+
     if (inter) clearTimeout(inter);
     return await unwrapSourceMaps(sources);
   } catch (err) {
