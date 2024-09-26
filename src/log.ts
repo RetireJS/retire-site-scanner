@@ -72,6 +72,7 @@ type CycloneDXComponent = {
   name: string;
   version: string;
   "bom-ref": string;
+  group?: string;
   purl?: string;
   licenses?: Array<{
     license?: {
@@ -208,10 +209,12 @@ export function convertToCycloneDX(resultToConvert: typeof collectedResults) {
     res.results.forEach((c) => {
       const key = c.component + "@" + c.version;
       const found = components.has(key);
+      const nameParts = c.component.split("/").reverse();
       const comp: CycloneDXComponent = components.get(key) || {
         type: "library",
         "bom-ref": randomUUID(),
-        name: c.component,
+        name: nameParts[0],
+        group: nameParts[1],
         version: c.version,
         purl: generatePURL(c),
         properties: [],

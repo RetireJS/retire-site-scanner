@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.5
+
+### Bugfix
+
+* Fix group vs name for scoped names in CycloneDX output
+
 ## 1.6.4
 
 ### Improvements
