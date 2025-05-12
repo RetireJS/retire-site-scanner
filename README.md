@@ -10,13 +10,13 @@ npm install -g retire-site-scanner
 ```
 Run:
 ```
-retire-site-scanner [-v] [--sbom] <url> 
+retire-site-scanner [-v] [--sbom] [--header "Name1: Value1"] [--header "Name2: Value2"] [--cookies "cookie1=value1; cookie2=value2"] <url> 
 ```
 
 ## Run using docker
 
 ```
-docker run --rm  ghcr.io/retirejs/retire-site-scanner:latest [-v] [--sbom] <url>
+docker run --rm  ghcr.io/retirejs/retire-site-scanner:latest [-v] [--sbom] [--header "Name1: Value1"] [--header "Name2: Value2"] [--cookies "cookie1=value1; cookie2=value2"] <url>
 ```
 
 
@@ -30,7 +30,7 @@ npm install
 
 ### Run directly from source
 ```
-npm run start -- <url> [-v] [--sbom]
+npm run start -- <url> [-v] [--sbom] [--header "Name1: Value1"] [--header "Name2: Value2"] [--cookies "cookie1=value1; cookie2=value2"]
 ```
 ### Run using Docker
 
@@ -43,8 +43,18 @@ docker build -t retire-site-scanner .
 ```
 **Scanning**
 ```
-docker run --rm retire-site-scanner [-v] [--sbom]
+docker run --rm retire-site-scanner [-v] [--sbom] [--header "Name1: Value1"] [--header "Name2: Value2"] [--cookies "cookie1=value1; cookie2=value2"] <url>
 ```
+
+## Options
+
+- `-v`: Verbose output (debug level)
+- `-vv`: Very verbose output (trace level)
+- `--sbom`: Generate a partial SBOM in CycloneDX format
+- `--docker`: Enable Docker-specific settings
+- `--color`: Enable colored output
+- `--header "Name: Value"`: Add a custom HTTP header to requests (can be specified multiple times for different headers)
+- `--cookies "cookie1=value1; cookie2=value2"`: Add cookies to requests
 
 ## SBOM support
 

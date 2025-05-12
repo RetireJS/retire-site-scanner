@@ -33,6 +33,7 @@ async function loadPage(
   onPageLoaded: (page: Page) => Promise<void>,
   onServiceInvoked: ServiceCallback,
   onRequest: (url: string, headers: Record<string, string>) => Promise<void>,
+  customHeaders: Record<string, string> = {},
 ) {
   const page = await browser.newPage();
   try {
@@ -42,6 +43,13 @@ async function loadPage(
     const promises: Promise<void>[] = [];
     await page.setUserAgent(UserAgent);
     await page.setCacheEnabled(false);
+
+    // Set custom headers if provided
+    if (Object.keys(customHeaders).length > 0) {
+      await page.setExtraHTTPHeaders(customHeaders);
+      log.debug(`Set custom headers: ${JSON.stringify(customHeaders)}`);
+    }
+
     const urlDomain = await getDomain(url, url);
     page.on("request", async (request) => {
       if (request.method() != "GET") return;
@@ -78,6 +86,7 @@ async function loadPage(
             response.url(),
             {
               ...cookieHeader,
+              ...customHeaders,
               referer: response.request().headers()["referer"] || url,
             },
             initiator,
@@ -145,6 +154,7 @@ async function load(
   onPageLoaded: (page: Page) => Promise<void>,
   onServiceInvoked: ServiceCallback,
   onRequest: (url: string, headers: Record<string, string>) => Promise<void>,
+  customHeaders: Record<string, string> = {},
 ) {
   log.info("Launching browser...");
   const browser = await puppeteer.launch({
@@ -163,6 +173,7 @@ async function load(
         onPageLoaded,
         onServiceInvoked,
         onRequest,
+        customHeaders,
       );
       break;
     } catch (error) {
