@@ -83,13 +83,45 @@ if (!urlToScan) {
   console.warn("ERROR: No url given");
   process.exit(1);
 }
-const knownArgs = ["--sbom", "-v", "-vv", "--docker", "--color"];
+const knownArgs = [
+  "--sbom",
+  "-v",
+  "-vv",
+  "--docker",
+  "--color",
+  "--header",
+  "--cookies",
+];
 const unknownArgs = process.argv
   .filter((x) => x.startsWith("-"))
   .filter((x) => !knownArgs.includes(x));
 if (unknownArgs.length > 0) {
   unknownArgs.forEach((a) => console.warn("ERROR: Unkown argument " + a));
   process.exit(1);
+}
+
+// Parse custom headers
+const customHeaders: Record<string, string> = {};
+
+// Find all occurrences of --header
+for (let i = 0; i < process.argv.length; i++) {
+  if (process.argv[i] === "--header" && i + 1 < process.argv.length) {
+    const headerString = process.argv[i + 1];
+    const parts = headerString.split(":");
+    if (parts.length >= 2) {
+      const key = parts[0].trim();
+      const value = parts.slice(1).join(":").trim();
+      customHeaders[key] = value;
+    }
+  }
+}
+
+// Parse cookies
+if (process.argv.includes("--cookies")) {
+  const cookiesIndex = process.argv.indexOf("--cookies");
+  if (cookiesIndex !== -1 && cookiesIndex + 1 < process.argv.length) {
+    customHeaders["cookie"] = process.argv[cookiesIndex + 1];
+  }
 }
 
 if (process.argv.includes("--sbom")) useJson();
@@ -156,6 +188,7 @@ retire().then((scanner) => {
       onPageLoaded,
       onService,
       checkRequestTarget,
+      customHeaders,
     )
     .then(() => {
       log.info(
