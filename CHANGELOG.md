@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.4
+
+* Dependency updates
+
 ## 1.7.3
 
 ### Bugfix
