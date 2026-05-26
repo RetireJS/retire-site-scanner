@@ -1,7 +1,7 @@
 {
   "author": "Erlend Oftedal <erlend@oftedal.no>",
   "name": "retire-site-scanner",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "license": "Apache-2.0",
   "description": "A scanner for checking a web site using retire.js",
   "main": "dist/index.js",
@@ -25,7 +25,7 @@
     "astronomical": "^3.0.5",
     "cacheable-lookup": "^7.0.0",
     "puppeteer": "^24.43.0",
-    "retire": "^5.2.2",
+    "retire": "^5.4.3",
     "source-map": "^0.7.4"
   },
   "devDependencies": {
