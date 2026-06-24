@@ -43,7 +43,9 @@ async function getDomain(url: string, baseDomain: string): Promise<string> {
         .join(".");
     }
   }
-  throw new Error("Failed to find URL i TLD list: " + url);
+  // No public suffix matched (e.g. localhost, raw IP addresses). Fall back to
+  // treating the whole hostname as the registrable domain.
+  return domain;
 }
 
 export default getDomain;

@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
     "test": "tsx --test 'tests/**/*.ts'",
+    "integrationTest": "tsx --test 'integration-tests/**/*.ts'",
     "lint": "eslint . --fix"
   },
   "dependencies": {
