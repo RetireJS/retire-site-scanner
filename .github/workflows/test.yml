@@ -11,21 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    container:
-      image: node:24-bookworm
-
     env:
-      # Use the distro Chromium instead of downloading Puppeteer's bundled
-      # Chrome, mirroring how the project's Dockerfile runs the scanner.
       PUPPETEER_SKIP_DOWNLOAD: "true"
-      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install Chromium
-        run: |
-          apt-get update
-          apt-get install -y chromium
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+      - run: echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
       - run: npm ci
       - run: npm run check
       - run: npm run build
