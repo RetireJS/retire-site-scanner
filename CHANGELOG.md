@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.7.5
+
+### Bugfix
+
+* Fix crash when scanning targets without a matching public suffix (e.g. `localhost` or raw IP addresses) — now falls back to using the full hostname instead of throwing
+
+### Other
+
+* Dependency updates
+* Add integration test suite
+* Simplify GitHub Actions test workflow
+
 ## 1.7.4
 
 * Dependency updates

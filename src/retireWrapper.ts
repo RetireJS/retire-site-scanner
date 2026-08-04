@@ -32,7 +32,7 @@ async function loadRetireJSRepo(): Promise<CombinedRepository> {
   return new Promise((resolve, reject) => {
     https
       .get(
-        "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v3.json",
+        "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository-v6-combined.json",
         (res) => {
           const data = [] as Buffer[];
           res.on("data", (d) => data.push(d));
