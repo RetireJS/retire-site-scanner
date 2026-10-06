@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.1
+
+### Other
+
+* Dependency updates (`ip-address` 10.7.3)
+
 ## 1.8.0
 
 ### Other
