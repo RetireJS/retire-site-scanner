@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8.0
+
+### Other
+
+* Upgrade `retire` to 6.x, which requires Node.js 20.19+ or 22.12+
+* Dependency updates
+
 ## 1.7.5
 
 ### Bugfix
